@@ -5,6 +5,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer, util
 from pdfminer.high_level import extract_text
 import docx
+import gc  # Import the garbage collection module
 
 model = SentenceTransformer("sentence-transformers/bert-base-nli-mean-tokens")
 
@@ -42,6 +43,9 @@ def main():
         # Extract text and generate embeddings for both files
         embeddings1 = extract_text_and_generate_embeddings(uploaded_file1)
         embeddings2 = extract_text_and_generate_embeddings(uploaded_file2)
+
+        # Explicitly call garbage collector
+        gc.collect()
 
         # Check if files are identical
         if np.array_equal(embeddings1, embeddings2):
