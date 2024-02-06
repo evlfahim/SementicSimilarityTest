@@ -5,9 +5,12 @@ import numpy as np
 from sentence_transformers import SentenceTransformer, util
 from pdfminer.high_level import extract_text
 import docx
+import faiss
 
+# Load pre-trained embeddings model
 model = SentenceTransformer("sentence-transformers/bert-base-nli-mean-tokens")
 
+# Function to extract text and generate embeddings
 def extract_text_and_generate_embeddings(file):
     text = ""
 
@@ -29,6 +32,18 @@ def calculate_cosine_similarity(embeddings1, embeddings2):
     similarity = util.pytorch_cos_sim(embeddings1, embeddings2).item()
     return similarity
 
+# Function to store embeddings in Faiss
+def store_embeddings_in_faiss(embeddings):
+    # Initialize the index
+    d = len(embeddings[0])  # dimension of the embeddings
+    index = faiss.IndexFlatIP(d)  # IndexFlatIP for inner product similarity
+
+    # Add embeddings to the index
+    index.add(np.array(embeddings, dtype=np.float32))
+
+    return index
+
+# Main function
 def main():
     st.title("Document Similarity Checker")
 
@@ -42,6 +57,10 @@ def main():
         # Extract text and generate embeddings for both files
         embeddings1 = extract_text_and_generate_embeddings(uploaded_file1)
         embeddings2 = extract_text_and_generate_embeddings(uploaded_file2)
+
+        # Store embeddings in Faiss
+        index1 = store_embeddings_in_faiss(embeddings1)
+        index2 = store_embeddings_in_faiss(embeddings2)
 
         # Check if files are identical
         if np.array_equal(embeddings1, embeddings2):
