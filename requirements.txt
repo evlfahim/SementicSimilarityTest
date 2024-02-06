@@ -3,3 +3,4 @@ numpy==1.21.2
 sentence-transformers==2.1.0
 huggingface-hub==0.0.12
 pdfminer.six==20201018
+python-docx==0.8.11
